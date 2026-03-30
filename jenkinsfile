@@ -3,6 +3,10 @@ pipeline {
       label 'ubuntu'
     }
 
+    environment {
+        CHAT_ID = '538826222'
+    }
+
     stages {
         stage('Build') {
             steps {
@@ -40,12 +44,30 @@ pipeline {
                 success {
                     // mail bcc: '', body: 'Build no. $BUILD_NUMBER', cc: '', from: '', replyTo: '', subject: 'build success', to: 'srengty@gmail.com'
                     // send using plugin http request to telegram bot api to send message to telegram channel (bot token has id i42026bot)
-                    httpRequest httpMode: 'POST', url: 'https://api.telegram.org/bot8624504079:AAH81aI4O-HESsXfVrsrjmKyRO2aGom7goM/sendMessage?chat_id=538826222&text=build%20success%20no.%20$BUILD_NUMBER'
+                    // httpRequest httpMode: 'POST', url: 'https://api.telegram.org/bot8624504079:AAH81aI4O-HESsXfVrsrjmKyRO2aGom7goM/sendMessage?chat_id=538826222&text=build%20success%20no.%20$BUILD_NUMBER'
+                    script {
+                        def msg = "build success no. ${env.BUILD_NUMBER}\\n${env.BUILD_URL}"
+
+                        withCredentials([string(credentialsId: 'i42026bot', variable: 'TOKEN')]) {
+                            httpRequest httpMode: 'POST', url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
+                            httpMode: 'POST',
+                            contentType: 'APPLICATION_FORM',
+                            requestBody: "chat_id=${env.CHAT_ID}&text=${msg}"
+                        }
+                    }
                 }
                 failure {
                     // mail bcc: '', body: 'Build no. $BUILD_NUMBER', cc: '', from: '', replyTo: '', subject: 'build failed', to: 'srengty@gmail.com'
-                    httpRequest httpMode: 'POST', url: 'https://api.telegram.org/bot8624504079:AAH81aI4O-HESsXfVrsrjmKyRO2aGom7goM/sendMessage?chat_id=538826222&text=build%20failed%20no.%20$BUILD_NUMBER'
+                    script {
+                        def msg = "build failed no. ${env.BUILD_NUMBER}\\n${env.BUILD_URL}"
 
+                        withCredentials([string(credentialsId: 'i42026bot', variable: 'TOKEN')]) {
+                            httpRequest httpMode: 'POST', url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
+                            httpMode: 'POST',
+                            contentType: 'APPLICATION_FORM',
+                            requestBody: "chat_id=${env.CHAT_ID}&text=${msg}"
+                        }
+                    }
                 }
             }
         }
