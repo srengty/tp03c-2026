@@ -49,10 +49,12 @@ pipeline {
                         def msg = "build success no. ${env.BUILD_NUMBER}\\n${env.BUILD_URL}"
 
                         withCredentials([string(credentialsId: 'i42026bot', variable: 'TOKEN')]) {
-                            httpRequest httpMode: 'POST', url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
-                            httpMode: 'POST',
-                            contentType: 'APPLICATION_FORM',
-                            requestBody: "chat_id=${env.CHAT_ID}&text=${msg}"
+                            httpRequest {
+                                url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
+                                httpMode: 'POST',
+                                contentType: 'APPLICATION_FORM',
+                                requestBody: "chat_id=${env.CHAT_ID}&text=${msg}"
+                            }
                         }
                     }
                 }
@@ -62,10 +64,12 @@ pipeline {
                         def msg = "build failed no. ${env.BUILD_NUMBER}\\n${env.BUILD_URL}"
 
                         withCredentials([string(credentialsId: 'i42026bot', variable: 'TOKEN')]) {
-                            httpRequest httpMode: 'POST', url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
-                            httpMode: 'POST',
-                            contentType: 'APPLICATION_FORM',
-                            requestBody: "chat_id=${env.CHAT_ID}&text=${msg}"
+                            httpRequest {
+                                url: "https://api.telegram.org/bot${TOKEN}/sendMessage",
+                                httpMode: 'POST',
+                                contentType: 'APPLICATION_FORM',
+                                requestBody: "chat_id=${env.CHAT_ID}&text=${msg}"
+                            }
                         }
                     }
                 }
