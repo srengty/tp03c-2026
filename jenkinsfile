@@ -1,0 +1,52 @@
+pipeline {
+    agent {
+      label 'ubuntu'
+    }
+
+    tools {
+        // Install the Maven version configured as "M3" and add it to the path.
+        // maven "M3"
+    }
+
+    stages {
+        stage('Build') {
+            steps {
+                // Get some code from a GitHub repository
+                // git 'https://github.com/srengty/tp03c-2026.git'
+                checkout scm
+
+                // Run Composer on a Unix agent.
+                sh "composer install"
+
+                // To run Composer on a Windows agent, use
+                // bat "composer install"
+
+                sh "npm install"
+
+                // copy .env.example to .env
+                sh "cp .env.example .env"
+
+                // change database connection settings in .env
+                // sh "sed -i 's/DB_HOST=localhost/DB_HOST=mysql/' .env"
+                // sh "sed -i 's/DB_DATABASE=homestead/DB_DATABASE=tp03c/' .env"
+
+                // generate application key
+                sh "php artisan key:generate"
+
+                // Run the tests with PHPUnit.
+                sh "php artisan test"
+            }
+
+            post {
+                // If Composer was able to run the tests, even if some of the test
+                // failed, record the test results and archive the jar file.
+                success {
+                    mail bcc: '', body: 'Build no. $BUILD_NUMBER', cc: '', from: '', replyTo: '', subject: 'build success', to: 'srengty@gmail.com'
+                }
+                failure {
+                    mail bcc: '', body: 'Build no. $BUILD_NUMBER', cc: '', from: '', replyTo: '', subject: 'build failed', to: 'srengty@gmail.com'
+                }
+            }
+        }
+    }
+}
